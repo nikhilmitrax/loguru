@@ -163,7 +163,16 @@ class Handler:
                     formatted = precomputed_format.format_map(formatter_record)
 
             if self._serialize:
-                formatted = self._serialize_record(formatted, record)
+                if isinstance(self._serialize, str):
+                    formatted = self._serialize_record(formatted, record)
+                elif callable(self._serialize):
+                    formatted = self._serialize(formatted, record)
+                else:
+                    raise TypeError(
+                        "Invalid format, it should be a string or a function, not: '%s'"
+                        % type(self._serialize).__name__
+                    )
+
 
             str_record = Message(formatted)
             str_record.record = record
